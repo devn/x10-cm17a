@@ -1,0 +1,3 @@
+February 8th, 2011:
+ * Renamed STR2CSTR to StringValuePtr
+ * Converted to new 1.9.2 char style by calling .ord where appropriate
