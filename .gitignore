@@ -14,3 +14,14 @@ pkg
 
 # For vim:
 *.swp
+
+# build files
+ext/cm17a_api/MANIFEST
+ext/cm17a_api/Makefile
+ext/cm17a_api/*.bundle
+ext/cm17a_api/*.so
+ext/cm17a_api/*.o
+ext/cm17a_api/*.log
+lib/*.bundle
+lib/*.so
+lib/*-*
