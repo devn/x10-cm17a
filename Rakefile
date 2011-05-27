@@ -2,7 +2,6 @@
 
 require 'rake/clean'
 require 'rake/testtask'
-require 'rake/rdoctask'
 require 'rbconfig'
 
 begin
@@ -10,6 +9,13 @@ begin
   require 'rake/gempackagetask'
 rescue Exception
   nil
+end
+
+begin
+  gem "rdoc"
+  require "rdoc/task"
+rescue Gem::LoadError
+  warn "RDoc 2.4.2+ is required to build documentation"
 end
 
 ARCH = Config::CONFIG['arch']
@@ -73,30 +79,32 @@ file "ext/cm17a_api/cm17a_api.so" => CM17A_FILES do
   end
 end
 
+
 # RDoc Documentation -------------------------------------------------
 
 # Choose template, prefer the jamis template if it is available
 
-def choose_rdoc_template
-  libdir = Config::CONFIG['rubylibdir']
-  templates = Dir[File.join(libdir, 'rdoc/**/jamis.rb')]
-  templates.empty? ? 'html': 'jamis'
+if defined?(RDoc::Task) then
+  def choose_rdoc_template
+    libdir = Config::CONFIG['rubylibdir']
+    templates = Dir[File.join(libdir, 'rdoc/**/jamis.rb')]
+    templates.empty? ? 'html': 'jamis'
+  end
+
+  RDoc::Task.new do |rdoc|
+    rdoc.rdoc_dir = 'html'
+    rdoc.template = choose_rdoc_template
+    rdoc.title    = "Ruby X10 Software"
+    rdoc.options << '--line-numbers' << '--inline-source' << '--main' << 'README'
+    rdoc.rdoc_files.include(
+      'lib/**/*.rb',
+      'doc/*.rdoc',
+      'ext/**/cm17a_api.c',
+      'README',
+      'MIT-LICENSE')
+    rdoc.rdoc_files.exclude('lib/**/other.rb', 'lib/**/bottlerocket.rb')
+  end
 end
-
-rd = Rake::RDocTask.new("rdoc") { |rdoc|
-  rdoc.rdoc_dir = 'html'
-  rdoc.template = choose_rdoc_template
-  rdoc.title    = "Ruby X10 Software"
-  rdoc.options << '--line-numbers' << '--inline-source' << '--main' << 'README'
-  rdoc.rdoc_files.include(
-    'lib/**/*.rb',
-    'doc/*.rdoc',
-    'ext/**/cm17a_api.c',
-    'README',
-    'MIT-LICENSE')
-  rdoc.rdoc_files.exclude('lib/**/other.rb', 'lib/**/bottlerocket.rb')
-}
-
 
 # Packaging Tasks ----------------------------------------------------
 
