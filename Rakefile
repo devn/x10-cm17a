@@ -5,18 +5,14 @@ require 'rake/testtask'
 require 'rbconfig'
 
 begin
-  require 'rubygems'
-  require 'rake/gempackagetask'
-rescue Exception
-  nil
-end
-
-begin
   gem "rdoc"
   require "rdoc/task"
 rescue Gem::LoadError
   warn "RDoc 2.4.2+ is required to build documentation"
 end
+
+require "rubygems/package_task"
+
 
 ARCH = Config::CONFIG['arch']
 SO_FILE = "lib/#{ARCH}/cm17a_api.so"
@@ -169,7 +165,7 @@ else
 #    s.homepage = "http://rake.rubyforge.org"
   end
 
-  Rake::GemPackageTask.new(spec) do |pkg|
+  Gem::PackageTask.new(spec) do |pkg|
     pkg.need_zip = true
     pkg.need_tar = true
   end
