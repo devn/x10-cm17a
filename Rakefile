@@ -15,12 +15,12 @@ require "rubygems/package_task"
 
 
 ARCH = Config::CONFIG['arch']
-SO_FILE = "lib/#{ARCH}/cm17a_api.so"
+SO_EXT = (ARCH =~ /darwin/) ? "bundle" : "so"
+SO_FILE = "lib/#{ARCH}/cm17a_api.#{SO_EXT}"
 
 MAKE = (ARCH =~ /win32/) ? 'nmake' : 'make'
 
 CLOBBER.include(
-  SO_FILE,
   'ext/cm17a_api/*.o',
   'ext/cm17a_api/*.obj',
   'ext/cm17a_api/*.def',
@@ -28,9 +28,12 @@ CLOBBER.include(
   'ext/cm17a_api/*.lib',
   'ext/cm17a_api/*.pdb',
   'ext/cm17a_api/*.so',
+  'ext/cm17a_api/*.bundle',
   'ext/cm17a_api/Makefile',
   'ext/cm17a_api/MANIFEST',
   'lib/*-*',
+  'lib/*.so',
+  'lib/*.bundle',
   '**/*.log'
   )
 
@@ -53,7 +56,7 @@ task :compile => [SO_FILE]
 
 directory File.dirname(SO_FILE)
 
-file SO_FILE => ["ext/cm17a_api/cm17a_api.so", File.dirname(SO_FILE)] do |t|
+file SO_FILE => ["ext/cm17a_api/cm17a_api.#{SO_EXT}", File.dirname(SO_FILE)] do |t|
   cp t.prerequisites.first, SO_FILE
 end
 
@@ -69,7 +72,7 @@ CM17A_FILES = FileList[
   'ext/cm17a_api/MANIFEST',
 ] 
 
-file "ext/cm17a_api/cm17a_api.so" => CM17A_FILES do
+file "ext/cm17a_api/cm17a_api.#{SO_EXT}" => CM17A_FILES do
   Dir.chdir("ext/cm17a_api") do
     sh MAKE
   end
