@@ -1,4 +1,4 @@
-= CM17A Firecracker X10 Interface Code
+# CM17A Firecracker X10 Interface Code
 
 The CM17A Firecracker X10 module is a simple to use X10 controller
 that attaches to the serial port of your computer.  It communicates
@@ -10,28 +10,22 @@ your house.
 The x10-cm17a allows Ruby programs to send simple on/off and
 dim/bright commands to any device controlled by the CM17A controller.
 
-== Download and Installation
+## Download and Installation
 
-=== Gem Installation
+### Gem Installation
 
 If you install using RubyGems, all you need to do is:
 
-  gem install x10-cm17a    # may require root privilege
+    gem install x10-cm17a    # may require root privilege
 
 Be aware that the x10-cm17a software contains a C extension and
 requires you to have a C build environment to install from
 source. This is not an issue on unix systems, but a C build
 environment is not part of the default Windows installations.  See
-http://rubygarden.org/ruby?WindowsCompiler for more information about
-compiling C extensions on windows.
+[here](http://rubygarden.org/ruby?WindowsCompiler) for more information
+about compiling C extensions on windows.
 
-I hope to have a binary gem for windows soon.
-
-=== TGZ Installation
-
-* Download the TGZ file from the x10-cm17a files area (http://rubyforge.org/project/showfiles.php?group_id=497).
-* Unpack the TGZ file into an appropriate directory.
-* CD into that directory and type:
+### Building by Hand
 
     ruby setup.rb config
     ruby setup.rb setup
@@ -40,21 +34,23 @@ I hope to have a binary gem for windows soon.
 Installing from a TGZ also requires a C build environment.  See the
 notes above in the gem install section for more details.
 
-== Using the CM17A Library
+## Using the CM17A Library
 
 Using the x10-cm17a library is very easy.  Here is the basic example:
 
-  require 'x10/cm17a'
+```ruby
+require 'x10/cm17a'
 
-  lamp = X10.device('a1')  # Create an X10 device
-                           # ... at X10 address 'a1'
-  lamp.on                  # Turn the device on
-  lamp.step -5             # Dim the lamp by 5 steps
-  lamp.off                 # Turn the lamp off
+lamp = X10.device('a1')  # Create an X10 device
+                         # ... at X10 address 'a1'
+lamp.on                  # Turn the device on
+lamp.step -5             # Dim the lamp by 5 steps
+lamp.off                 # Turn the lamp off
+```
 
 That's all there to it!
 
-== Explicit X10 Controller Selection
+## Explicit X10 Controller Selection
 
 By default, the X10 system will find the controller loaded by the
 require statement and use that.  If there are more than one X10
@@ -62,10 +58,12 @@ controller class loaded in the system, or if you wish to construct the
 controller with arguments, then you need to explicitly create the X10
 controller.
 
-* If your CM17A module is on <code>/dev/ttyS1</code> (instead of the
-  default <code>/dev/ttyS0</code>), you may do the following:
+* If your CM17A module is on `/dev/ttyS1` (instead of the
+  default `/dev/ttyS0`), you may do the following:
 
-    X10.controller = X10::Cm17a::Controller.new("/dev/ttyS1")
+```ruby
+X10.controller = X10::Cm17a::Controller.new("/dev/ttyS1")
+```
 
 * If you wish to use the remote DRb driver to access a CM17A module on
   a remote computer, you may use the following:
@@ -73,13 +71,13 @@ controller.
     X10.controller =
       X10::Cm17aRemote::Controller.new("druby://remote_host:7777")
 
-== License
+## License
 
 Except as noted below, this software is made available under an
 MIT-style open source license. See the file MIT-LICENSE included in
 the distribution for details.
 
-=== Additional Licence for cm17a.h and cm17a.c
+### Additional License for cm17a.h and cm17a.c
 
 The C code for x10-cm17a was, in part, derived from the Linux FlipIt
 command line utility for controlling the CM17A firecracker module.
@@ -113,7 +111,7 @@ command line utility for controlling the CM17A firecracker module.
   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
   OF SUCH DAMAGE.
 
-=== Additional Licence for cm17a.c
+### Additional Licence for cm17a.c
 
 In addition to the FlipIt project, the windows compatibility code was
 derived from Adam Brigg's CM17A windows project.
@@ -129,7 +127,7 @@ derived from Adam Brigg's CM17A windows project.
   distribution of the software without specific, written prior
   permission.
 
-                              *** DISCLAIMER ***
+#### *** DISCLAIMER ***
 
   ADAM BRIGGS DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
   SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -140,7 +138,7 @@ derived from Adam Brigg's CM17A windows project.
   ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
   THIS SOFTWARE.
 
-== More X10 and CM17A Information
+## More X10 and CM17A Information
 
 * http://x10.com
 * http://www.pragmaticautomation.com/cgi-bin/pragauto.cgi/Monitor/Devices/BubbleBubbleBuildsInTrouble.rdoc
