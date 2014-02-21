@@ -16,12 +16,12 @@ module X10
       # Create an X10::Cm17a::Device on this controller at the given
       # X10 house and unit address.
       def device(house, unit)
-	X10::Cm17a::Device.new(house, unit, self)
+        X10::Cm17a::Device.new(house, unit, self)
       end
 
       # Yes, this class represents a X10 controller.
       def self.x10_controller?
-	true
+        true
       end
     end
 

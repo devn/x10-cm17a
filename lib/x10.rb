@@ -31,7 +31,7 @@ end
 # devices and software.  It also provides a few utility methods for
 # use by the X10 controllers and devices.
 module X10
-  
+
   # Error thrown for X10 specific failures.
   class X10Error < RuntimeError; end
 
@@ -43,12 +43,12 @@ module X10
       house, unit = parse_address(address)
       controller.device(house, unit)
     end
-    
-    # Return the controller currently in use.  
+
+    # Return the controller currently in use.
     def controller
       @controller ||= discover_single_controller
     end
-    
+
     # Set the controller to be used to create X10 devices.  If there
     # is only one X10 controller loaded, then that controller will be
     # used by default.  Otherwise, the controller must be explicitly
@@ -56,7 +56,7 @@ module X10
     def controller=(controller)
       @controller = controller
     end
-    
+
     # Make a canonical X10 device address from the house number and
     # unit.  House and unit numbers are zero based.
     def make_address(house, unit)
@@ -68,15 +68,15 @@ module X10
     def parse_address(address)
       address = address.downcase
       if address !~ /^([a-p])(\d+)$/
-	fail X10::X10Error, "Bad X10 device address [#{address}]"
+        fail X10::X10Error, "Bad X10 device address [#{address}]"
       end
       house_letter = $1
       unit = $2.to_i - 1
-      
+
       if unit < 0 || unit > 15
-	fail X10::X10Error, "Bad X10 device address [#{address}]"
+        fail X10::X10Error, "Bad X10 device address [#{address}]"
       end
-      
+
       house = address[0].ord - ?a.ord
       [house, unit]
     end
@@ -86,16 +86,16 @@ module X10
     def discover_single_controller
       controllers = []
       ObjectSpace.each_object(Class) do |c|
-	controllers << c if c.x10_controller?
+        controllers << c if c.x10_controller?
       end
       case controllers.size
       when 0
-	fail X10::X10Error, "No X10 Controllers Found"
+        fail X10::X10Error, "No X10 Controllers Found"
       when 1
-	controllers.first.new
+        controllers.first.new
       else
-	fail X10::X10Error, "Multiple X10 Controllers Found"
-      end      
+        fail X10::X10Error, "Multiple X10 Controllers Found"
+      end
     end
   end
 
