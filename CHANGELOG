@@ -1,4 +1,4 @@
-== Version 1.0.2
+== Version 2.0.0
 
 * Renamed STR2CSTR to StringValuePtr
 * Converted to new 1.9.2 char style by calling .ord where appropriate
