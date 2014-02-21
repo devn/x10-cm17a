@@ -2,23 +2,25 @@
 
 require 'rake/clean'
 require 'rake/testtask'
-require 'rake/rdoctask'
 require 'rbconfig'
 
 begin
-  require 'rubygems'
-  require 'rake/gempackagetask'
-rescue Exception
-  nil
+  gem "rdoc"
+  require "rdoc/task"
+rescue Gem::LoadError
+  warn "RDoc 2.4.2+ is required to build documentation"
 end
 
+require "rubygems/package_task"
+
+
 ARCH = Config::CONFIG['arch']
-SO_FILE = "lib/#{ARCH}/cm17a_api.so"
+SO_EXT = (ARCH =~ /darwin/) ? "bundle" : "so"
+SO_FILE = "lib/#{ARCH}/cm17a_api.#{SO_EXT}"
 
 MAKE = (ARCH =~ /win32/) ? 'nmake' : 'make'
 
 CLOBBER.include(
-  SO_FILE,
   'ext/cm17a_api/*.o',
   'ext/cm17a_api/*.obj',
   'ext/cm17a_api/*.def',
@@ -26,9 +28,12 @@ CLOBBER.include(
   'ext/cm17a_api/*.lib',
   'ext/cm17a_api/*.pdb',
   'ext/cm17a_api/*.so',
+  'ext/cm17a_api/*.bundle',
   'ext/cm17a_api/Makefile',
   'ext/cm17a_api/MANIFEST',
   'lib/*-*',
+  'lib/*.so',
+  'lib/*.bundle',
   '**/*.log'
   )
 
@@ -51,7 +56,7 @@ task :compile => [SO_FILE]
 
 directory File.dirname(SO_FILE)
 
-file SO_FILE => ["ext/cm17a_api/cm17a_api.so", File.dirname(SO_FILE)] do |t|
+file SO_FILE => ["ext/cm17a_api/cm17a_api.#{SO_EXT}", File.dirname(SO_FILE)] do |t|
   cp t.prerequisites.first, SO_FILE
 end
 
@@ -67,36 +72,38 @@ CM17A_FILES = FileList[
   'ext/cm17a_api/MANIFEST',
 ] 
 
-file "ext/cm17a_api/cm17a_api.so" => CM17A_FILES do
+file "ext/cm17a_api/cm17a_api.#{SO_EXT}" => CM17A_FILES do
   Dir.chdir("ext/cm17a_api") do
     sh MAKE
   end
 end
 
+
 # RDoc Documentation -------------------------------------------------
 
 # Choose template, prefer the jamis template if it is available
 
-def choose_rdoc_template
-  libdir = Config::CONFIG['rubylibdir']
-  templates = Dir[File.join(libdir, 'rdoc/**/jamis.rb')]
-  templates.empty? ? 'html': 'jamis'
+if defined?(RDoc::Task) then
+  def choose_rdoc_template
+    libdir = Config::CONFIG['rubylibdir']
+    templates = Dir[File.join(libdir, 'rdoc/**/jamis.rb')]
+    templates.empty? ? 'html': 'jamis'
+  end
+
+  RDoc::Task.new do |rdoc|
+    rdoc.rdoc_dir = 'html'
+    rdoc.template = choose_rdoc_template
+    rdoc.title    = "Ruby X10 Software"
+    rdoc.options << '--line-numbers' << '--inline-source' << '--main' << 'README'
+    rdoc.rdoc_files.include(
+      'lib/**/*.rb',
+      'doc/*.rdoc',
+      'ext/**/cm17a_api.c',
+      'README',
+      'MIT-LICENSE')
+    rdoc.rdoc_files.exclude('lib/**/other.rb', 'lib/**/bottlerocket.rb')
+  end
 end
-
-rd = Rake::RDocTask.new("rdoc") { |rdoc|
-  rdoc.rdoc_dir = 'html'
-  rdoc.template = choose_rdoc_template
-  rdoc.title    = "Ruby X10 Software"
-  rdoc.options << '--line-numbers' << '--inline-source' << '--main' << 'README'
-  rdoc.rdoc_files.include(
-    'lib/**/*.rb',
-    'doc/*.rdoc',
-    'ext/**/cm17a_api.c',
-    'README',
-    'MIT-LICENSE')
-  rdoc.rdoc_files.exclude('lib/**/other.rb', 'lib/**/bottlerocket.rb')
-}
-
 
 # Packaging Tasks ----------------------------------------------------
 
@@ -161,7 +168,7 @@ else
 #    s.homepage = "http://rake.rubyforge.org"
   end
 
-  Rake::GemPackageTask.new(spec) do |pkg|
+  Gem::PackageTask.new(spec) do |pkg|
     pkg.need_zip = true
     pkg.need_tar = true
   end

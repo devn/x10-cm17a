@@ -24,11 +24,11 @@ class MockController < FlexMock
   class << self
     def setup_controller(controller)
       X10.controller =  controller
-      controller.mock_handle(:device, 1) { |house, unit|
+      controller.should_receive(:device).returns { |house, unit|
 	X10::Cm17a::Device.new(house, unit, controller)
       }
     end
-    
+
     def use
       super do |mock|
 	setup_controller(mock)
@@ -56,7 +56,7 @@ class TestCm17a < Test::Unit::TestCase
 
   def test_on
     MockController.use do |controller|
-      controller.mock_handle(:command, 1) { |house, unit, cmd, step|
+      controller.should_receive(:command).returns { |house, unit, cmd, step|
 	assert_equal :on, cmd
 	assert_equal 0, step
       }
@@ -67,7 +67,7 @@ class TestCm17a < Test::Unit::TestCase
 
   def test_off
     MockController.use do |controller|
-      controller.mock_handle(:command, 1) { |house, unit, cmd, step|
+      controller.should_receive(:command).returns { |house, unit, cmd, step|
 	assert_equal :off, cmd
 	assert_equal 0, step
       }
@@ -78,7 +78,7 @@ class TestCm17a < Test::Unit::TestCase
 
   def test_adjust
     MockController.use do |controller|
-      controller.mock_handle(:command, 2) { |house, unit, cmd, step|
+      controller.should_receive(:command).times(2).returns { |house, unit, cmd, step|
 	if step == 4
 	  assert_equal 4, step
 	  assert_equal :brighten, cmd
@@ -95,7 +95,7 @@ class TestCm17a < Test::Unit::TestCase
 
   def test_big_adjustments
     MockController.use do |controller|
-      controller.mock_handle(:command, 2) { |house, unit, cmd, step|
+      controller.should_receive(:command) { |house, unit, cmd, step|
 	assert_equal :dim, cmd
 	if step == 6
 	  assert_equal 6, step
@@ -110,7 +110,7 @@ class TestCm17a < Test::Unit::TestCase
 
   def test_small_adjustments
     MockController.use do |controller|
-      controller.mock_handle(:command, 0) { }
+      controller.should_receive(:command).returns { }
       dev = X10.device('a1')
       dev.step(0)
     end
@@ -118,7 +118,7 @@ class TestCm17a < Test::Unit::TestCase
 
   def test_device_addressing
     MockController.use do |controller|
-      controller.mock_handle(:command) { |house, unit, cmd, step|
+      controller.should_receive(:command).returns { |house, unit, cmd, step|
 	assert_equal 1, house
 	assert_equal 2, unit
       }
