@@ -1,3 +1,22 @@
-February 8th, 2011:
- * Renamed STR2CSTR to StringValuePtr
- * Converted to new 1.9.2 char style by calling .ord where appropriate
+== Version 1.0.2
+
+* Renamed STR2CSTR to StringValuePtr
+* Converted to new 1.9.2 char style by calling .ord where appropriate
+
+== Version 1.0.1
+
+* Fixed a bug in the brighten command.
+
+== Version 1.0.0
+
+* Added DRb support (x10/cm17a_remote)
+
+* Added a DRb server (x10server.rb)
+
+* Removed queries from the X10 device API.  Since the
+  device object can't report the _actual_ state of the X10 device,
+  allowing queries for the state seems misleading.
+
+== Version 0.9.0
+
+Initial release.
